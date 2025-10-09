@@ -1,0 +1,7 @@
+{
+  "example.property": "I AM VAULT DEFAULT",
+  "spring.datasource.url": "jdbc:postgresql://postgres:5432/ostock_dev",
+  "spring.datasource.username": "postgres",
+  "spring.datasource.password": "postgres",
+  "spring.jpa.hibernate.ddl-auto": "validate"
+}
