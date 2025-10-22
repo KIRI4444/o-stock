@@ -1,13 +1,12 @@
 package com.optimagrowth.license.controller;
 
-import com.optimagrowth.license.config.ServiceConfig;
 import com.optimagrowth.license.model.License;
 import com.optimagrowth.license.service.LicenseService;
 import lombok.AllArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import java.util.Locale;
+import java.util.List;
 
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.linkTo;
 import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
@@ -18,14 +17,8 @@ import static org.springframework.hateoas.server.mvc.WebMvcLinkBuilder.methodOn;
 public class LicenseController {
 
     private LicenseService licenseService;
-    private ServiceConfig serviceConfig;
 
-    @GetMapping("/config/example-property")
-    public ResponseEntity<String> getExampleProperty() {
-        return ResponseEntity.ok(serviceConfig.getProperty());
-    }
-
-    @RequestMapping(value="/{licenseId}",method = RequestMethod.GET)
+    @GetMapping("/{licenseId}")
     public ResponseEntity<License> getLicense( @PathVariable("organizationId") String organizationId,
                                                @PathVariable("licenseId") String licenseId) {
 
@@ -50,8 +43,13 @@ public class LicenseController {
         return ResponseEntity.ok(licenseService.createLicense(request));
     }
 
-    @DeleteMapping(value="/{licenseId}")
+    @DeleteMapping("/{licenseId}")
     public ResponseEntity<String> deleteLicense(@PathVariable("licenseId") String licenseId) {
         return ResponseEntity.ok(licenseService.deleteLicense(licenseId));
+    }
+
+    @GetMapping("/")
+    public List<License> getLicenses(@PathVariable("organizationId") String organizationId) {
+        return licenseService.getLicensesByOrganization(organizationId);
     }
 }

@@ -1,12 +1,21 @@
 spring:
   application:
-    name: licensing-service
+    name: gateway-server
   profiles:
     active: default
   cloud:
     config:
-      uri: http://localhost:8071
+      url: http://localhost:8071
       enabled: true
+
+    gateway:
+      server:
+        webflux:
+          discovery:
+            locator:
+              enabled: true
+              lower-case-service-id: true
+
   config:
     import: "configserver:"
 
