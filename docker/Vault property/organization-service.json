@@ -25,5 +25,22 @@
   "eureka.client.serviceUrl.defaultZone": "http://eureka-server:8761/eureka/",
 
   "management.endpoints.web.exposure.include": "*",
-  "management.endpoints.enabled-by-default": "true"
+  "management.endpoints.enabled-by-default": "true",
+
+  "spring.cloud.stream.bindings.output-out-0.destination": "organizationTopic",
+  "spring.cloud.stream.bindings.output-out-0.content-type": "application/json",
+
+  "spring.cloud.stream.kafka.binder.brokers": "kafka:9092",
+  "spring.cloud.stream.kafka.binder.auto-create-topics": "true",
+  "spring.cloud.stream.kafka.binder.auto-add-partitions": "true",
+
+  "spring.cloud.stream.kafka.binder.producer-properties.acks": "all",
+  "spring.cloud.stream.kafka.binder.producer-properties.retries": "3",
+  "spring.cloud.stream.kafka.binder.producer-properties.batch-size": "16384",
+  "spring.cloud.stream.kafka.binder.producer-properties.linger.ms": "1",
+  "spring.cloud.stream.kafka.binder.producer-properties.buffer-memory": "33554432",
+
+  "logging.level.org.springframework.cloud.stream": "DEBUG",
+  "logging.level.org.apache.kafka": "INFO",
+  "logging.level.org.springframework.kafka": "DEBUG"
 }

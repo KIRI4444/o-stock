@@ -3,7 +3,6 @@ package com.optimagrowth.organization_service.controller;
 import com.optimagrowth.organization_service.model.Organization;
 import com.optimagrowth.organization_service.service.OrganizationService;
 import lombok.AllArgsConstructor;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -15,7 +14,9 @@ public class OrganizationController {
 
     private OrganizationService service;
 
-
+    // TODO "Протестировать м-сервис организаций с использованием ролей
+    //       Разобраться почему не работает просто роль ADMIN
+    //       "
     @RequestMapping(value="/{organizationId}",method = RequestMethod.GET)
     public ResponseEntity<Organization> getOrganization(@PathVariable("organizationId") String organizationId) {
         return ResponseEntity.ok(service.findById(organizationId));
@@ -33,8 +34,8 @@ public class OrganizationController {
 
     @RequestMapping(value="/{organizationId}",method = RequestMethod.DELETE)
     @ResponseStatus(HttpStatus.NO_CONTENT)
-    public void deleteOrganization( @PathVariable("id") String id,  @RequestBody Organization organization) {
-        service.delete(organization);
+    public void deleteOrganization( @PathVariable("id") String id) {
+        service.delete(id);
     }
 
 }

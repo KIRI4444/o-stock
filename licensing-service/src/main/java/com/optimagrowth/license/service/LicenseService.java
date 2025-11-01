@@ -3,25 +3,31 @@ package com.optimagrowth.license.service;
 import com.optimagrowth.license.config.ServiceConfig;
 import com.optimagrowth.license.model.License;
 import com.optimagrowth.license.model.Organization;
+import com.optimagrowth.license.repository.OrganizationRedisRepository;
+import com.optimagrowth.license.service.client.OrganizationCacheService;
 import com.optimagrowth.license.service.client.OrganizationFeignClient;
 import lombok.AllArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.context.MessageSource;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import com.optimagrowth.license.repository.LicenseRepository;
 
 @Service
+@Slf4j
 @AllArgsConstructor
+
 public class LicenseService {
 
     private final MessageSource messages;
     private final LicenseRepository licenseRepository;
     private final ServiceConfig config;
     private final OrganizationFeignClient organizationFeignClient;
+    private final OrganizationCacheService organizationCacheService;
 
     public License getLicense(String licenseId, String organizationId) {
         License license = licenseRepository.findByOrganizationIdAndLicenseId(organizationId, licenseId);
@@ -31,10 +37,26 @@ public class LicenseService {
                             licenseId, organizationId));
         }
 
-        // Используем Feign
-        Organization organization = organizationFeignClient.getOrganization(organizationId);
+        // 1. Идем в кэш рэдиса
+        Optional<Organization> cachedOrganization  = organizationCacheService.getOrganization(organizationId);
 
-        System.out.println("Organization from Feign: " + organization);
+        Organization organization;
+
+        if (cachedOrganization.isPresent()) {
+            organization = cachedOrganization.get();
+            log.debug("Organization {} found in cache", organizationId);
+        } else {
+            log.debug("Unable to locate organization in cache {}", organizationId);
+            // 2. Если нет в кэше, то стреляем через Feign
+            organization = organizationFeignClient.getOrganization(organizationId);
+            log.debug("Organization {} fetched from Feign", organizationId);
+
+            if (organization != null) {
+                // 3. Сохраняем в кэш, если нашли оргу
+                organizationCacheService.cacheOrganization(organization);
+                log.debug("Organization {} successfully added to cache", organizationId);
+            }
+        }
 
         if (null != organization) {
             license.setOrganizationName(organization.getName());
